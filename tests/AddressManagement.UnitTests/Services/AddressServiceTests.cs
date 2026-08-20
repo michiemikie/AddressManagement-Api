@@ -45,4 +45,43 @@ public class AddressServiceTests
         Assert.Equal(dto.FirstName, result.FirstName);
         Assert.Equal(dto.LastName, result.LastName);
     }
+    [Fact]
+    public async Task GetByIdAsync_WithExistingId_ReturnsMappedAddress()
+    {
+        // Arrange
+        var address = new Address
+        {
+            Id = Guid.NewGuid(),
+            FirstName = "Erika",
+            LastName = "Musterfrau",
+            Street = "Beispielweg",
+            HouseNumber = "5",
+            PostalCode = "10115",
+            City = "Berlin",
+            Country = "Germany",
+        };
+        _repository.GetByIdAsync(address.Id, Arg.Any<CancellationToken>()).Returns(address);
+
+        // Act
+        var result = await _sut.GetByIdAsync(address.Id);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(address.Id, result!.Id);
+        Assert.Equal("Berlin", result.City);
+    }
+
+    [Fact]
+    public async Task GetByIdAsync_WithUnknownId_ReturnsNull()
+    {
+        // Arrange
+        _repository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns((Address?)null);
+
+        // Act
+        var result = await _sut.GetByIdAsync(Guid.NewGuid());
+
+        // Assert
+        Assert.Null(result);
+    }
 }

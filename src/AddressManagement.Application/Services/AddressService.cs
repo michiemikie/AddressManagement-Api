@@ -61,8 +61,28 @@ public class AddressService : IAddressService
     // Bis dahin würde der Compiler meckern, dass das Interface nicht
     // vollständig implementiert ist - das lösen wir gleich mit `throw new NotImplementedException()`.
 
-    public Task<AddressResponseDto?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
-        => throw new NotImplementedException();
+    public async Task<AddressResponseDto?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        var entity = await _repository.GetByIdAsync(id, cancellationToken);
+
+        if (entity is null)
+        {
+            return null;
+        }
+
+        return new AddressResponseDto
+        {
+            Id = entity.Id,
+            FirstName = entity.FirstName,
+            LastName = entity.LastName,
+            Street = entity.Street,
+            HouseNumber = entity.HouseNumber,
+            PostalCode = entity.PostalCode,
+            City = entity.City,
+            Country = entity.Country,
+            Email = entity.Email,
+        };
+    }
 
     public Task<IReadOnlyList<AddressResponseDto>> GetAllAsync(string? city, string? postalCode, CancellationToken cancellationToken = default)
         => throw new NotImplementedException();
