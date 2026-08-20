@@ -18,4 +18,8 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\AddressManagement.Application\AddressManagement.Application.csproj" />
+  </ItemGroup>
+
 </Project>
