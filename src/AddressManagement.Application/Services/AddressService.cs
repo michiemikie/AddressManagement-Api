@@ -1,6 +1,7 @@
 ﻿using AddressManagement.Application.DTOs;
 using AddressManagement.Application.Interfaces;
 using AddressManagement.Domain.Entities;
+using System.Linq;
 
 namespace AddressManagement.Application.Services;
 
@@ -84,12 +85,31 @@ public class AddressService : IAddressService
         };
     }
 
-    public Task<IReadOnlyList<AddressResponseDto>> GetAllAsync(string? city, string? postalCode, CancellationToken cancellationToken = default)
-        => throw new NotImplementedException();
+
+    public async Task<IReadOnlyList<AddressResponseDto>> GetAllAsync(string? city, string? postalCode, CancellationToken cancellationToken = default)
+    {
+        var entities = await _repository.GetAllAsync(city, postalCode, cancellationToken);
+
+        return entities
+            .Select(entity => new AddressResponseDto
+            {
+                Id = entity.Id,
+                FirstName = entity.FirstName,
+                LastName = entity.LastName,
+                Street = entity.Street,
+                HouseNumber = entity.HouseNumber,
+                PostalCode = entity.PostalCode,
+                City = entity.City,
+                Country = entity.Country,
+                Email = entity.Email,
+            })
+            .ToList();
+    }
 
     public Task<AddressResponseDto?> UpdateAsync(Guid id, AddressUpdateDto dto, CancellationToken cancellationToken = default)
         => throw new NotImplementedException();
 
     public Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
         => throw new NotImplementedException();
+
 }

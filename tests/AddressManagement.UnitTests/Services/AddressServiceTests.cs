@@ -84,4 +84,35 @@ public class AddressServiceTests
         // Assert
         Assert.Null(result);
     }
+    [Fact]
+    public async Task GetAllAsync_WithCityFilter_ReturnsOnlyMatchingAddresses()
+    {
+        // Arrange
+        var berlinAddress = new Address { Id = Guid.NewGuid(), City = "Berlin" };
+
+        _repository.GetAllAsync("Berlin", null, Arg.Any<CancellationToken>())
+            .Returns(new List<Address> { berlinAddress });
+
+        // Act
+        var result = await _sut.GetAllAsync(city: "Berlin", postalCode: null);
+
+        // Assert
+        Assert.Single(result);
+        Assert.Equal("Berlin", result[0].City);
+    }
+
+    [Fact]
+    public async Task GetAllAsync_WithoutFilter_PassesNullFiltersToRepository()
+    {
+        // Arrange
+        _repository.GetAllAsync(null, null, Arg.Any<CancellationToken>())
+            .Returns(new List<Address>());
+
+        // Act
+        var result = await _sut.GetAllAsync(city: null, postalCode: null);
+
+        // Assert
+        Assert.Empty(result);
+        await _repository.Received(1).GetAllAsync(null, null, Arg.Any<CancellationToken>());
+    }
 }
