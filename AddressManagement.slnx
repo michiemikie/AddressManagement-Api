@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/AddressManagement.Api/AddressManagement.Api.csproj" />
+    <Project Path="src/AddressManagement.Application/AddressManagement.Application.csproj" />
+    <Project Path="src/AddressManagement.Domain/AddressManagement.Domain.csproj" />
+    <Project Path="src/AddressManagement.Infrastructure/AddressManagement.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/AddressManagement.IntegrationTests/AddressManagement.IntegrationTests.csproj" />
+    <Project Path="tests/AddressManagement.UnitTests/AddressManagement.UnitTests.csproj" />
+  </Folder>
+</Solution>
