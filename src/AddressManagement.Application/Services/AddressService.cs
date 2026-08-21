@@ -105,10 +105,46 @@ public class AddressService : IAddressService
             })
             .ToList();
     }
+    /// <summary>
+    /// SOLID: Open/Closed Principle (OCP) — in spirit
+    /// This method mutates the existing tracked entity rather than
+    /// replacing it wholesale. If we later add a field (e.g. an audit
+    /// timestamp), this update logic can be extended without breaking
+    /// the "identity" of the entity (same object reference, same Id).
+    /// </summary>
+    public async Task<AddressResponseDto?> UpdateAsync(Guid id, AddressUpdateDto dto, CancellationToken cancellationToken = default)
+    {
+        var entity = await _repository.GetByIdAsync(id, cancellationToken);
 
-    public Task<AddressResponseDto?> UpdateAsync(Guid id, AddressUpdateDto dto, CancellationToken cancellationToken = default)
-        => throw new NotImplementedException();
+        if (entity is null)
+        {
+            return null;
+        }
 
+        entity.FirstName = dto.FirstName;
+        entity.LastName = dto.LastName;
+        entity.Street = dto.Street;
+        entity.HouseNumber = dto.HouseNumber;
+        entity.PostalCode = dto.PostalCode;
+        entity.City = dto.City;
+        entity.Country = dto.Country;
+        entity.Email = dto.Email;
+
+        await _repository.UpdateAsync(entity, cancellationToken);
+
+        return new AddressResponseDto
+        {
+            Id = entity.Id,
+            FirstName = entity.FirstName,
+            LastName = entity.LastName,
+            Street = entity.Street,
+            HouseNumber = entity.HouseNumber,
+            PostalCode = entity.PostalCode,
+            City = entity.City,
+            Country = entity.Country,
+            Email = entity.Email,
+        };
+    }
     public Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
         => throw new NotImplementedException();
 

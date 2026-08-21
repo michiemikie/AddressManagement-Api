@@ -115,4 +115,56 @@ public class AddressServiceTests
         Assert.Empty(result);
         await _repository.Received(1).GetAllAsync(null, null, Arg.Any<CancellationToken>());
     }
+    [Fact]
+    public async Task UpdateAsync_WithExistingId_UpdatesAndReturnsAddress()
+    {
+        // Arrange
+        var existing = new Address
+        {
+            Id = Guid.NewGuid(),
+            FirstName = "Old",
+            LastName = "Name",
+            Street = "Old Street",
+            HouseNumber = "1",
+            PostalCode = "00000",
+            City = "Old City",
+            Country = "Germany",
+        };
+        _repository.GetByIdAsync(existing.Id, Arg.Any<CancellationToken>()).Returns(existing);
+
+        var dto = new AddressUpdateDto
+        {
+            FirstName = "New",
+            LastName = "Name",
+            Street = "New Street",
+            HouseNumber = "2",
+            PostalCode = "11111",
+            City = "New City",
+            Country = "Germany",
+        };
+
+        // Act
+        var result = await _sut.UpdateAsync(existing.Id, dto);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal("New", result!.FirstName);
+        Assert.Equal("New City", result.City);
+        await _repository.Received(1).UpdateAsync(Arg.Any<Address>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task UpdateAsync_WithUnknownId_ReturnsNullAndDoesNotCallRepositoryUpdate()
+    {
+        // Arrange
+        _repository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns((Address?)null);
+
+        // Act
+        var result = await _sut.UpdateAsync(Guid.NewGuid(), new AddressUpdateDto());
+
+        // Assert
+        Assert.Null(result);
+        await _repository.DidNotReceive().UpdateAsync(Arg.Any<Address>(), Arg.Any<CancellationToken>());
+    }
 }
