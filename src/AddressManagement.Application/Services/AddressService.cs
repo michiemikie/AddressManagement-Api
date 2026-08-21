@@ -145,7 +145,16 @@ public class AddressService : IAddressService
             Email = entity.Email,
         };
     }
-    public Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
-        => throw new NotImplementedException();
+    public async Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        var entity = await _repository.GetByIdAsync(id, cancellationToken);
 
+        if (entity is null)
+        {
+            return false;
+        }
+
+        await _repository.DeleteAsync(entity, cancellationToken);
+        return true;
+    }
 }

@@ -167,4 +167,33 @@ public class AddressServiceTests
         Assert.Null(result);
         await _repository.DidNotReceive().UpdateAsync(Arg.Any<Address>(), Arg.Any<CancellationToken>());
     }
+    [Fact]
+    public async Task DeleteAsync_WithExistingId_ReturnsTrueAndCallsRepositoryDelete()
+    {
+        // Arrange
+        var existing = new Address { Id = Guid.NewGuid() };
+        _repository.GetByIdAsync(existing.Id, Arg.Any<CancellationToken>()).Returns(existing);
+
+        // Act
+        var result = await _sut.DeleteAsync(existing.Id);
+
+        // Assert
+        Assert.True(result);
+        await _repository.Received(1).DeleteAsync(existing, Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task DeleteAsync_WithUnknownId_ReturnsFalseAndDoesNotCallRepositoryDelete()
+    {
+        // Arrange
+        _repository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns((Address?)null);
+
+        // Act
+        var result = await _sut.DeleteAsync(Guid.NewGuid());
+
+        // Assert
+        Assert.False(result);
+        await _repository.DidNotReceive().DeleteAsync(Arg.Any<Address>(), Arg.Any<CancellationToken>());
+    }
 }
