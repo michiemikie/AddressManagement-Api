@@ -3,6 +3,7 @@ using AddressManagement.Application.Services;
 using AddressManagement.Infrastructure.Persistence;
 using AddressManagement.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
+using AddressManagement.Api.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
