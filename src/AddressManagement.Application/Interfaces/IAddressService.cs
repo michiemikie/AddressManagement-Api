@@ -1,5 +1,6 @@
 ﻿using AddressManagement.Application.DTOs;
 
+
 namespace AddressManagement.Application.Interfaces;
 
 /// <summary>
@@ -23,10 +24,12 @@ public interface IAddressService
 
     Task<AddressResponseDto?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
 
-    Task<IReadOnlyList<AddressResponseDto>> GetAllAsync(
-        string? city,
-        string? postalCode,
-        CancellationToken cancellationToken = default);
+    Task<PagedResultDto<AddressResponseDto>> GetAllAsync(
+     string? city,
+     string? postalCode,
+     int page,
+     int pageSize,
+     CancellationToken cancellationToken = default);
 
     Task<AddressResponseDto?> UpdateAsync(Guid id, AddressUpdateDto dto, CancellationToken cancellationToken = default);
 

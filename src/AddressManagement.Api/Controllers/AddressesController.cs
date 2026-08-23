@@ -32,15 +32,17 @@ public class AddressesController : ControllerBase
         var address = await _addressService.GetByIdAsync(id, cancellationToken);
         return address is null ? NotFound() : Ok(address);
     }
-    /// <summary>Lists addresses, optionally filtered by city and/or postal code.</summary>
+    /// <summary>Lists addresses, optionally filtered by city and/or postal code, with pagination.</summary>
     [HttpGet]
-    public async Task<ActionResult<IReadOnlyList<AddressResponseDto>>> GetAll(
+    public async Task<ActionResult<PagedResultDto<AddressResponseDto>>> GetAll(
         [FromQuery] string? city,
         [FromQuery] string? postalCode,
-        CancellationToken cancellationToken)
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 20,
+        CancellationToken cancellationToken = default)
     {
-        var addresses = await _addressService.GetAllAsync(city, postalCode, cancellationToken);
-        return Ok(addresses);
+        var result = await _addressService.GetAllAsync(city, postalCode, page, pageSize, cancellationToken);
+        return Ok(result);
     }
 
     /// <summary>Fully replaces an existing address.</summary>

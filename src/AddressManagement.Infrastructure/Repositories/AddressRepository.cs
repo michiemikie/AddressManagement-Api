@@ -43,10 +43,12 @@ public class AddressRepository : IAddressRepository
             .FirstOrDefaultAsync(a => a.Id == id, cancellationToken);
     }
 
-    public async Task<IReadOnlyList<Address>> GetAllAsync(
-        string? city,
-        string? postalCode,
-        CancellationToken cancellationToken = default)
+    public async Task<(IReadOnlyList<Address> Items, int TotalCount)> GetAllAsync(
+    string? city,
+    string? postalCode,
+    int page,
+    int pageSize,
+    CancellationToken cancellationToken = default)
     {
         var query = _context.Addresses.AsNoTracking().AsQueryable();
 
@@ -60,12 +62,17 @@ public class AddressRepository : IAddressRepository
             query = query.Where(a => a.PostalCode == postalCode);
         }
 
-        return await query
+        var totalCount = await query.CountAsync(cancellationToken);
+
+        var items = await query
             .OrderBy(a => a.LastName)
             .ThenBy(a => a.FirstName)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
             .ToListAsync(cancellationToken);
-    }
 
+        return (items, totalCount);
+    }
     public async Task UpdateAsync(Address address, CancellationToken cancellationToken = default)
     {
         _context.Addresses.Update(address);

@@ -84,36 +84,37 @@ public class AddressServiceTests
         // Assert
         Assert.Null(result);
     }
+    
     [Fact]
     public async Task GetAllAsync_WithCityFilter_ReturnsOnlyMatchingAddresses()
     {
         // Arrange
         var berlinAddress = new Address { Id = Guid.NewGuid(), City = "Berlin" };
 
-        _repository.GetAllAsync("Berlin", null, Arg.Any<CancellationToken>())
-            .Returns(new List<Address> { berlinAddress });
+        _repository.GetAllAsync("Berlin", null, 1, 20, Arg.Any<CancellationToken>())
+            .Returns((new List<Address> { berlinAddress }, 1));
 
         // Act
-        var result = await _sut.GetAllAsync(city: "Berlin", postalCode: null);
+        var result = await _sut.GetAllAsync(city: "Berlin", postalCode: null, page: 1, pageSize: 20);
 
         // Assert
-        Assert.Single(result);
-        Assert.Equal("Berlin", result[0].City);
+        Assert.Single(result.Items);
+        Assert.Equal("Berlin", result.Items[0].City);
+        Assert.Equal(1, result.TotalCount);
     }
-
     [Fact]
     public async Task GetAllAsync_WithoutFilter_PassesNullFiltersToRepository()
     {
         // Arrange
-        _repository.GetAllAsync(null, null, Arg.Any<CancellationToken>())
-            .Returns(new List<Address>());
+        _repository.GetAllAsync(null, null, 1, 20, Arg.Any<CancellationToken>())
+            .Returns((new List<Address>(), 0));
 
         // Act
-        var result = await _sut.GetAllAsync(city: null, postalCode: null);
+        var result = await _sut.GetAllAsync(city: null, postalCode: null, page: 1, pageSize: 20);
 
         // Assert
-        Assert.Empty(result);
-        await _repository.Received(1).GetAllAsync(null, null, Arg.Any<CancellationToken>());
+        Assert.Empty(result.Items);
+        await _repository.Received(1).GetAllAsync(null, null, 1, 20, Arg.Any<CancellationToken>());
     }
     [Fact]
     public async Task UpdateAsync_WithExistingId_UpdatesAndReturnsAddress()

@@ -96,8 +96,8 @@ public class AddressesControllerTests : IClassFixture<CustomWebApplicationFactor
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        var result = await response.Content.ReadFromJsonAsync<List<AddressResponseDto>>();
-        Assert.All(result!, address => Assert.Equal("Hamburg", address.City));
+        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<AddressResponseDto>>();
+        Assert.All(result!.Items, address => Assert.Equal("Hamburg", address.City));
     }
 
     [Fact]

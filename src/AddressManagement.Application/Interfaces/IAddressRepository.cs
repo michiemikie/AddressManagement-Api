@@ -24,10 +24,12 @@ public interface IAddressRepository
 
     Task<Address?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
 
-    Task<IReadOnlyList<Address>> GetAllAsync(
-        string? city,
-        string? postalCode,
-        CancellationToken cancellationToken = default);
+    Task<(IReadOnlyList<Address> Items, int TotalCount)> GetAllAsync(
+     string? city,
+     string? postalCode,
+     int page,
+     int pageSize,
+     CancellationToken cancellationToken = default);
 
     Task UpdateAsync(Address address, CancellationToken cancellationToken = default);
 

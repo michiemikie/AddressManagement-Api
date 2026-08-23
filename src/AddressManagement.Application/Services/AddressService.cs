@@ -86,24 +86,40 @@ public class AddressService : IAddressService
     }
 
 
-    public async Task<IReadOnlyList<AddressResponseDto>> GetAllAsync(string? city, string? postalCode, CancellationToken cancellationToken = default)
+    public async Task<PagedResultDto<AddressResponseDto>> GetAllAsync(
+    string? city,
+    string? postalCode,
+    int page,
+    int pageSize,
+    CancellationToken cancellationToken = default)
     {
-        var entities = await _repository.GetAllAsync(city, postalCode, cancellationToken);
+        // Defensive Grenzen: falls der Client ungültige Werte schickt, nutzen
+        // wir sinnvolle Standardwerte statt einen Fehler zu werfen.
+        page = page < 1 ? 1 : page;
+        pageSize = pageSize is < 1 or > 100 ? 20 : pageSize;
 
-        return entities
-            .Select(entity => new AddressResponseDto
-            {
-                Id = entity.Id,
-                FirstName = entity.FirstName,
-                LastName = entity.LastName,
-                Street = entity.Street,
-                HouseNumber = entity.HouseNumber,
-                PostalCode = entity.PostalCode,
-                City = entity.City,
-                Country = entity.Country,
-                Email = entity.Email,
-            })
-            .ToList();
+        var (entities, totalCount) = await _repository.GetAllAsync(city, postalCode, page, pageSize, cancellationToken);
+
+        return new PagedResultDto<AddressResponseDto>
+        {
+            Items = entities
+                .Select(entity => new AddressResponseDto
+                {
+                    Id = entity.Id,
+                    FirstName = entity.FirstName,
+                    LastName = entity.LastName,
+                    Street = entity.Street,
+                    HouseNumber = entity.HouseNumber,
+                    PostalCode = entity.PostalCode,
+                    City = entity.City,
+                    Country = entity.Country,
+                    Email = entity.Email,
+                })
+                .ToList(),
+            Page = page,
+            PageSize = pageSize,
+            TotalCount = totalCount,
+        };
     }
     /// <summary>
     /// SOLID: Open/Closed Principle (OCP) — in spirit
