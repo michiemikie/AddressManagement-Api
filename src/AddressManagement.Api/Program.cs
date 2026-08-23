@@ -23,6 +23,7 @@ builder.Services.AddScoped<IAddressService, AddressService>();
 var app = builder.Build();
 
 // --- Middleware-Pipeline ---
+app.UseProblemDetailsExceptionHandling();
 
 if (app.Environment.IsDevelopment())
 {

@@ -145,6 +145,39 @@ public class AddressService : IAddressService
             Email = entity.Email,
         };
     }
+    public async Task<AddressResponseDto?> PatchAsync(Guid id, AddressPatchDto dto, CancellationToken cancellationToken = default)
+    {
+        var entity = await _repository.GetByIdAsync(id, cancellationToken);
+
+        if (entity is null)
+        {
+            return null;
+        }
+
+        if (dto.FirstName is not null) entity.FirstName = dto.FirstName;
+        if (dto.LastName is not null) entity.LastName = dto.LastName;
+        if (dto.Street is not null) entity.Street = dto.Street;
+        if (dto.HouseNumber is not null) entity.HouseNumber = dto.HouseNumber;
+        if (dto.PostalCode is not null) entity.PostalCode = dto.PostalCode;
+        if (dto.City is not null) entity.City = dto.City;
+        if (dto.Country is not null) entity.Country = dto.Country;
+        if (dto.Email is not null) entity.Email = dto.Email;
+
+        await _repository.UpdateAsync(entity, cancellationToken);
+
+        return new AddressResponseDto
+        {
+            Id = entity.Id,
+            FirstName = entity.FirstName,
+            LastName = entity.LastName,
+            Street = entity.Street,
+            HouseNumber = entity.HouseNumber,
+            PostalCode = entity.PostalCode,
+            City = entity.City,
+            Country = entity.Country,
+            Email = entity.Email,
+        };
+    }
     public async Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
     {
         var entity = await _repository.GetByIdAsync(id, cancellationToken);

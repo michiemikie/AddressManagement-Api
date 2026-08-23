@@ -196,4 +196,42 @@ public class AddressServiceTests
         Assert.False(result);
         await _repository.DidNotReceive().DeleteAsync(Arg.Any<Address>(), Arg.Any<CancellationToken>());
     }
+
+    [Fact]
+    public async Task PatchAsync_WithPartialData_OnlyUpdatesProvidedFields()
+    {
+        // Arrange
+        var existing = new Address
+        {
+            Id = Guid.NewGuid(),
+            FirstName = "Max",
+            LastName = "Mustermann",
+            City = "Wetzlar",
+        };
+        _repository.GetByIdAsync(existing.Id, Arg.Any<CancellationToken>()).Returns(existing);
+
+        var patch = new AddressPatchDto { City = "Berlin" };
+
+        // Act
+        var result = await _sut.PatchAsync(existing.Id, patch);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal("Berlin", result!.City);
+        Assert.Equal("Max", result.FirstName); // unverändert
+    }
+
+    [Fact]
+    public async Task PatchAsync_WithUnknownId_ReturnsNull()
+    {
+        // Arrange
+        _repository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns((Address?)null);
+
+        // Act
+        var result = await _sut.PatchAsync(Guid.NewGuid(), new AddressPatchDto());
+
+        // Assert
+        Assert.Null(result);
+    }
 }

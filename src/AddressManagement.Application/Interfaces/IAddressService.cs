@@ -30,5 +30,7 @@ public interface IAddressService
 
     Task<AddressResponseDto?> UpdateAsync(Guid id, AddressUpdateDto dto, CancellationToken cancellationToken = default);
 
+    Task<AddressResponseDto?> PatchAsync(Guid id, AddressPatchDto dto, CancellationToken cancellationToken = default);
+
     Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default);
 }
