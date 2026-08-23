@@ -175,4 +175,33 @@ public class AddressesControllerTests : IClassFixture<CustomWebApplicationFactor
         // Assert
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
+
+    [Fact]
+    public async Task Patch_WithPartialData_Returns200AndUpdatesOnlyGivenFields()
+    {
+        // Arrange
+        var createResponse = await _client.PostAsJsonAsync("/api/addresses", ValidCreateDto());
+        var created = await createResponse.Content.ReadFromJsonAsync<AddressResponseDto>();
+
+        var patchDto = new AddressPatchDto { City = "Hamburg" };
+
+        // Act
+        var response = await _client.PatchAsJsonAsync($"/api/addresses/{created!.Id}", patchDto);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var body = await response.Content.ReadFromJsonAsync<AddressResponseDto>();
+        Assert.Equal("Hamburg", body!.City);
+        Assert.Equal(created.FirstName, body.FirstName); // unverändert
+    }
+
+    [Fact]
+    public async Task Patch_WithUnknownId_Returns404()
+    {
+        // Act
+        var response = await _client.PatchAsJsonAsync($"/api/addresses/{Guid.NewGuid()}", new AddressPatchDto());
+
+        // Assert
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
 }

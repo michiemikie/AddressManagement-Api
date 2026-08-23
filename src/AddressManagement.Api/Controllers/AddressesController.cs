@@ -54,6 +54,17 @@ public class AddressesController : ControllerBase
         return updated is null ? NotFound() : Ok(updated);
     }
 
+    /// <summary>Partially updates an existing address.</summary>
+    [HttpPatch("{id:guid}")]
+    public async Task<ActionResult<AddressResponseDto>> Patch(
+        Guid id,
+        [FromBody] AddressPatchDto dto,
+        CancellationToken cancellationToken)
+    {
+        var updated = await _addressService.PatchAsync(id, dto, cancellationToken);
+        return updated is null ? NotFound() : Ok(updated);
+    }
+
     /// <summary>Deletes an address.</summary>
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
