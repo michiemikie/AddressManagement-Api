@@ -54,7 +54,9 @@ public class AddressService : IAddressService
             City = created.City,
             Country = created.Country,
             Email = created.Email,
+            RowVersion = created.RowVersion is null ? null : Convert.ToBase64String(created.RowVersion),
         };
+
     }
 
     // Die anderen Interface-Methoden (GetByIdAsync, GetAllAsync, UpdateAsync,
@@ -82,6 +84,7 @@ public class AddressService : IAddressService
             City = entity.City,
             Country = entity.Country,
             Email = entity.Email,
+            RowVersion = entity.RowVersion is null ? null : Convert.ToBase64String(entity.RowVersion),
         };
     }
 
@@ -114,6 +117,8 @@ public class AddressService : IAddressService
                     City = entity.City,
                     Country = entity.Country,
                     Email = entity.Email,
+                    RowVersion = entity.RowVersion is null ? null : Convert.ToBase64String(entity.RowVersion),
+
                 })
                 .ToList(),
             Page = page,
@@ -135,6 +140,14 @@ public class AddressService : IAddressService
         if (entity is null)
         {
             return null;
+        }
+
+        // Falls der Client einen RowVersion-Token mitschickt, übernehmen wir ihn
+        // als "Original-Wert" - das ist es, was EF Core beim Speichern mit dem
+        // aktuellen DB-Stand vergleicht, um Concurrency-Konflikte zu erkennen.
+        if (!string.IsNullOrEmpty(dto.RowVersion))
+        {
+            entity.RowVersion = Convert.FromBase64String(dto.RowVersion);
         }
 
         entity.FirstName = dto.FirstName;
@@ -159,6 +172,7 @@ public class AddressService : IAddressService
             City = entity.City,
             Country = entity.Country,
             Email = entity.Email,
+            RowVersion = entity.RowVersion is null ? null : Convert.ToBase64String(entity.RowVersion),
         };
     }
     public async Task<AddressResponseDto?> PatchAsync(Guid id, AddressPatchDto dto, CancellationToken cancellationToken = default)

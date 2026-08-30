@@ -12,6 +12,11 @@
 /// </summary>
 public class AddressResponseDto
 {
+    /// <summary>
+    /// Base64-encoded concurrency token. Clients must send this back on
+    /// PUT requests so the server can detect concurrent modifications.
+    /// </summary>
+    public string? RowVersion { get; set; }
     public Guid Id { get; set; }
     public string FirstName { get; set; } = string.Empty;
     public string LastName { get; set; } = string.Empty;

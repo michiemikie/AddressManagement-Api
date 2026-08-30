@@ -40,6 +40,10 @@ Dependency Injection.
     in der Response.
   - **Swagger/OpenAPI** ist unter `/swagger` im Development-Modus verfügbar.
   - **Strikte Trennung zwischen Entity und DTO** über alle Endpunkte hinweg.
+  -   - **Optimistic Concurrency** via `RowVersion`-Property. Hinweis: Der InMemory-Provider
+    erzwingt Concurrency-Tokens nicht vollständig realistisch wie eine echte relationale
+    Datenbank (z. B. SQL Server) — der Code ist korrekt aufgebaut, aber der 409-Conflict-Fall
+    lässt sich mit InMemory nicht zuverlässig auslösen/testen.
   
 ## Ausführung
 

@@ -12,6 +12,12 @@ namespace AddressManagement.Application.DTOs;
 /// </summary>
 public class AddressUpdateDto
 {
+    /// <summary>
+    /// Base64-encoded concurrency token, taken from a previous GET/POST response.
+    /// If provided, the update fails with 409 Conflict if the address was
+    /// modified since this token was issued.
+    /// </summary>
+    public string? RowVersion { get; set; }
     [Required, MaxLength(100)]
     public string FirstName { get; set; } = string.Empty;
 
