@@ -33,6 +33,7 @@ public class AddressDbContext : DbContext
             builder.Property(a => a.City).IsRequired().HasMaxLength(100);
             builder.Property(a => a.Country).IsRequired().HasMaxLength(100);
             builder.Property(a => a.Email).HasMaxLength(200);
+            builder.Property(a => a.RowVersion).IsRowVersion();
 
             builder.HasIndex(a => a.City);
             builder.HasIndex(a => a.PostalCode);

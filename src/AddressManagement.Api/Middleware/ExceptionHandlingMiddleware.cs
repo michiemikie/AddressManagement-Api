@@ -1,5 +1,6 @@
 ﻿using System.Net.Mime;
 using Microsoft.AspNetCore.Mvc;
+using AddressManagement.Application.Exceptions;
 
 namespace AddressManagement.Api.Middleware;
 
@@ -24,6 +25,21 @@ public class ExceptionHandlingMiddleware
         try
         {
             await _next(context);
+        }
+        catch (ConcurrencyConflictException ex)
+        {
+            var problemDetails = new ProblemDetails
+            {
+                Title = "Concurrency conflict",
+                Status = StatusCodes.Status409Conflict,
+                Detail = ex.Message,
+                Instance = context.Request.Path,
+            };
+
+            context.Response.ContentType = MediaTypeNames.Application.Json;
+            context.Response.StatusCode = StatusCodes.Status409Conflict;
+
+            await context.Response.WriteAsJsonAsync(problemDetails);
         }
         catch (Exception ex)
         {

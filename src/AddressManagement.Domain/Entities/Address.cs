@@ -17,6 +17,11 @@ namespace AddressManagement.Domain.Entities;
 /// </summary>
 public class Address
 {
+    /// <summary>
+    /// Used for optimistic concurrency checks - EF Core compares this value
+    /// on update/delete to detect if another process modified the row first.
+    /// </summary>
+    public byte[]? RowVersion { get; set; }
     public Guid Id { get; set; }
 
     public string FirstName { get; set; } = string.Empty;

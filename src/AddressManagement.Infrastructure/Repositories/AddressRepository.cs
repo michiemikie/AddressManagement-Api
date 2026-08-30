@@ -2,6 +2,7 @@
 using AddressManagement.Domain.Entities;
 using AddressManagement.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using AddressManagement.Application.Exceptions;
 
 namespace AddressManagement.Infrastructure.Repositories;
 
@@ -76,12 +77,30 @@ public class AddressRepository : IAddressRepository
     public async Task UpdateAsync(Address address, CancellationToken cancellationToken = default)
     {
         _context.Addresses.Update(address);
-        await _context.SaveChangesAsync(cancellationToken);
+
+        try
+        {
+            await _context.SaveChangesAsync(cancellationToken);
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            throw new ConcurrencyConflictException(
+                $"Address with id '{address.Id}' was modified concurrently. Please reload and try again.");
+        }
     }
 
     public async Task DeleteAsync(Address address, CancellationToken cancellationToken = default)
     {
         _context.Addresses.Remove(address);
-        await _context.SaveChangesAsync(cancellationToken);
+
+        try
+        {
+            await _context.SaveChangesAsync(cancellationToken);
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            throw new ConcurrencyConflictException(
+                $"Address with id '{address.Id}' was modified concurrently. Please reload and try again.");
+        }
     }
 }
