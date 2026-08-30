@@ -15,8 +15,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 
+builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<AddressDbContext>(options =>
     options.UseInMemoryDatabase("AddressManagementDb"));
 
@@ -68,4 +68,9 @@ app.MapControllers();
 app.Run();
 
 // Wird von WebApplicationFactory in den Integrationstests benötigt.
+// Wird von WebApplicationFactory in den Integrationstests benötigt.
+public partial class Program
+{
+}
+
 public record JwtSettings(string Key, string Issuer);
