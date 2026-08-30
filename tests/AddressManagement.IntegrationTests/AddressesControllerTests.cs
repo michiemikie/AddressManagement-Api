@@ -11,7 +11,7 @@ public class AddressesControllerTests : IClassFixture<CustomWebApplicationFactor
 
     public AddressesControllerTests(CustomWebApplicationFactory factory)
     {
-        _client = factory.CreateClient();
+        _client = factory.CreateAuthenticatedClientAsync().GetAwaiter().GetResult();
     }
 
     private static AddressCreateDto ValidCreateDto() => new()

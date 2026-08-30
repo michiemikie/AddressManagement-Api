@@ -1,11 +1,15 @@
 ﻿using AddressManagement.Application.DTOs;
 using AddressManagement.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AddressManagement.Api.Controllers;
 
 [ApiController]
 [Route("api/addresses")]
+[Authorize]
+
+
 public class AddressesController : ControllerBase
 {
     private readonly IAddressService _addressService;

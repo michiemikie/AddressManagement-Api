@@ -1,4 +1,6 @@
-﻿using AddressManagement.Infrastructure.Persistence;
+﻿using System.Net.Http.Headers;
+using System.Net.Http.Json;
+using AddressManagement.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
@@ -31,4 +33,29 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
                 options.UseInMemoryDatabase(_databaseName));
         });
     }
+
+    /// <summary>
+    /// Creates an HttpClient that automatically logs in with the demo user
+    /// and attaches a valid JWT to every request, so tests don't need to
+    /// repeat the login flow themselves.
+    /// </summary>
+    public async Task<HttpClient> CreateAuthenticatedClientAsync()
+    {
+        var client = CreateClient();
+
+        var loginResponse = await client.PostAsJsonAsync("/api/auth/login", new
+        {
+            Username = "admin",
+            Password = "password123",
+        });
+
+        var loginResult = await loginResponse.Content.ReadFromJsonAsync<LoginResult>();
+
+        client.DefaultRequestHeaders.Authorization =
+            new AuthenticationHeaderValue("Bearer", loginResult!.Token);
+
+        return client;
+    }
+
+    private record LoginResult(string Token, DateTime ExpiresAt);
 }
