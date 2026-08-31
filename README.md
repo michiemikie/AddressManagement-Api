@@ -44,6 +44,11 @@ Dependency Injection.
     erzwingt Concurrency-Tokens nicht vollständig realistisch wie eine echte relationale
     Datenbank (z. B. SQL Server) — der Code ist korrekt aufgebaut, aber der 409-Conflict-Fall
     lässt sich mit InMemory nicht zuverlässig auslösen/testen.
+      - **JWT-Authentifizierung:** Alle `/api/addresses`-Endpunkte sind mit `[Authorize]` geschützt.
+    Login über `POST /api/auth/login` (Demo-Nutzer: `admin` / `password123`) liefert einen
+    signierten JWT-Token, der im `Authorization: Bearer <token>`-Header mitgeschickt werden muss.
+    Getestet über die Integrationstests (`CreateAuthenticatedClientAsync`), die den echten
+    Login-Flow durchlaufen.
   
 ## Ausführung
 

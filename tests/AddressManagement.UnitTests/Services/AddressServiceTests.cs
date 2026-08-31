@@ -2,6 +2,7 @@
 using AddressManagement.Application.Interfaces;
 using AddressManagement.Application.Services;
 using AddressManagement.Domain.Entities;
+using Microsoft.Extensions.Caching.Memory;
 using NSubstitute;
 using Xunit;
 
@@ -15,7 +16,8 @@ public class AddressServiceTests
     public AddressServiceTests()
     {
         _repository = Substitute.For<IAddressRepository>();
-        _sut = new AddressService(_repository);
+        var cache = new MemoryCache(new MemoryCacheOptions());
+        _sut = new AddressService(_repository, cache);
     }
 
     [Fact]

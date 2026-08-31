@@ -1,6 +1,7 @@
 ﻿using AddressManagement.Application.DTOs;
 using AddressManagement.Application.Interfaces;
 using AddressManagement.Domain.Entities;
+using Microsoft.Extensions.Caching.Memory;
 using System.Linq;
 
 namespace AddressManagement.Application.Services;
@@ -17,14 +18,19 @@ namespace AddressManagement.Application.Services;
 /// a concrete EF Core class. This is what lets us test this class with a
 /// fake repository (see AddressServiceTests) instead of a real database.
 /// </summary>
+
 public class AddressService : IAddressService
 {
-    private readonly IAddressRepository _repository;
 
-    public AddressService(IAddressRepository repository)
+    private readonly IAddressRepository _repository;
+    private readonly IMemoryCache _cache;
+
+    public AddressService(IAddressRepository repository, IMemoryCache cache)
     {
         _repository = repository;
+        _cache = cache;
     }
+    
 
     public async Task<AddressResponseDto> CreateAsync(AddressCreateDto dto, CancellationToken cancellationToken = default)
     {
@@ -59,6 +65,8 @@ public class AddressService : IAddressService
 
     }
 
+
+
     // Die anderen Interface-Methoden (GetByIdAsync, GetAllAsync, UpdateAsync,
     // DeleteAsync) kommen im nächsten TDD-Zyklus - erst Test, dann Code.
     // Bis dahin würde der Compiler meckern, dass das Interface nicht
@@ -66,6 +74,13 @@ public class AddressService : IAddressService
 
     public async Task<AddressResponseDto?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
+        var cacheKey = $"address_{id}";
+
+        if (_cache.TryGetValue(cacheKey, out AddressResponseDto? cached))
+        {
+            return cached;
+        }
+
         var entity = await _repository.GetByIdAsync(id, cancellationToken);
 
         if (entity is null)
@@ -73,7 +88,7 @@ public class AddressService : IAddressService
             return null;
         }
 
-        return new AddressResponseDto
+        var dto = new AddressResponseDto
         {
             Id = entity.Id,
             FirstName = entity.FirstName,
@@ -86,8 +101,11 @@ public class AddressService : IAddressService
             Email = entity.Email,
             RowVersion = entity.RowVersion is null ? null : Convert.ToBase64String(entity.RowVersion),
         };
-    }
 
+        _cache.Set(cacheKey, dto, TimeSpan.FromMinutes(5));
+
+        return dto;
+    }
 
     public async Task<PagedResultDto<AddressResponseDto>> GetAllAsync(
     string? city,
@@ -161,6 +179,8 @@ public class AddressService : IAddressService
 
         await _repository.UpdateAsync(entity, cancellationToken);
 
+        _cache.Remove($"address_{id}");
+
         return new AddressResponseDto
         {
             Id = entity.Id,
@@ -195,6 +215,8 @@ public class AddressService : IAddressService
 
         await _repository.UpdateAsync(entity, cancellationToken);
 
+        _cache.Remove($"address_{id}");
+
         return new AddressResponseDto
         {
             Id = entity.Id,
@@ -218,6 +240,10 @@ public class AddressService : IAddressService
         }
 
         await _repository.DeleteAsync(entity, cancellationToken);
+
+        _cache.Remove($"address_{id}");
+
         return true;
     }
+   
 }

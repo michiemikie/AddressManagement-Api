@@ -13,6 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
 // --- Services registrieren ---
 
 builder.Services.AddControllers();
+builder.Services.AddMemoryCache();
 
 builder.Services.AddEndpointsApiExplorer();
 
