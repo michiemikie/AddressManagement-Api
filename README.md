@@ -49,6 +49,15 @@ Dependency Injection.
     signierten JWT-Token, der im `Authorization: Bearer <token>`-Header mitgeschickt werden muss.
     Getestet über die Integrationstests (`CreateAuthenticatedClientAsync`), die den echten
     Login-Flow durchlaufen.
+
+    - **Bonus-Features:**
+  - **PATCH** (`AddressPatchDto`) für Partial Updates – nur gesetzte Felder werden übernommen.
+  - **Pagination** (`page`, `pageSize`) auf `GET /api/addresses`, inkl. `TotalCount`/`TotalPages`
+    in der Response.
+  - **Swagger/OpenAPI** ist unter `/swagger` im Development-Modus verfügbar.
+  - **Strikte Trennung zwischen Entity und DTO** über alle Endpunkte hinweg.
+  - **Optimistic Concurrency** via `RowVersion`-Property. Hinweis: ...
+  - **JWT-Authentifizierung:** ...
   
 ## Ausführung
 
